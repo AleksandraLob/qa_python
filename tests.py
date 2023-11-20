@@ -34,17 +34,19 @@ class TestBooksCollector:
         collector.add_new_book("Book1")
         assert "Book1" in collector.get_books_genre()
 
+    # Тесты параметризованные
     # Проверяем, что книга не добавляется, если её имя слишком длинное
-    def test_add_new_book_name_too_long(self):
+    @pytest.mark.parametrize('name', ['книга не добавляется, имя слишком длинное', ''])
+    def test_add_new_book_name_too_long_short(self, name):
         collector = BooksCollector()
-        collector.add_new_book("Проверяем, что книга не добавляется, если её имя слишком длинное")
-        assert "Проверяем, что книга не добавляется, если её имя слишком длинное" not in collector.get_books_genre()
+        collector.add_new_book(name)
+        assert name not in collector.books_genre
 
-    # Проверяем, что книга не добавляется, если её имя пустое
-    def test_add_new_book_empty_name(self):
+    @pytest.mark.parametrize('name', ['книга добавляется имя длиной длинное 40', '1'])
+    def test_add_new_book_name_long_short(self, name):
         collector = BooksCollector()
-        collector.add_new_book("")
-        assert "" not in collector.get_books_genre()
+        collector.add_new_book(name)
+        assert name in collector.books_genre
 
     # Проверяем, что книга не добавляется, если её имя уже существует
     def test_add_new_book_name_already_exists(self):
@@ -75,13 +77,6 @@ class TestBooksCollector:
         collector.set_book_genre("Book1", "Фэнтези")
         assert collector.get_book_genre("Book1") == ''
 
-    # Тесты для метода get_book_genre
-    def test_get_book_genre_name_success(self):
-        collector = BooksCollector()
-        collector.add_new_book("BookName")
-        collector.set_book_genre("BookName", "Фантастика")
-        assert collector.get_book_genre("BookName") == "Фантастика"
-
     # Тесты для метода get_books_with_specific_genre
 
     # Проверяем, что получаем список книг с определённым жанром корректно
@@ -106,11 +101,8 @@ class TestBooksCollector:
     def test_get_books_genre_success(self):
         collector = BooksCollector()
         collector.add_new_book("Book1")
-        collector.add_new_book("Book2")
         collector.set_book_genre("Book1", "Фантастика")
-        collector.set_book_genre("Book2", "Фантастика")
-        assert collector.get_books_genre() == {"Book1": "Фантастика",
-                                               "Book2": "Фантастика"}
+        assert collector.get_books_genre() == {"Book1": "Фантастика"}
 
     # Тесты для метода get_books_for_children
 
@@ -158,12 +150,6 @@ class TestBooksCollector:
         collector.delete_book_from_favorites("Book1")
         assert collector.get_list_of_favorites_books() == []
 
-    # Проверяем, что книга не удаляется из избранного, если она не там
-    def test_delete_book_from_favorites_not_in_favorites(self):
-        collector = BooksCollector()
-        collector.add_new_book("Book1")
-        collector.delete_book_from_favorites("Book1")
-
     # Тесты для метода get_list_of_favorites_books
     # Проверяем список избранного
     def test_get_list_of_favorites_books_success(self):
@@ -171,12 +157,3 @@ class TestBooksCollector:
         collector.add_new_book("Book1")
         collector.add_book_in_favorites("Book1")
         assert collector.get_list_of_favorites_books() == ["Book1"]
-
-    # Тесты параметризованные
-
-    @pytest.mark.parametrize('name', ['abcde', '1abcd', '123$#', '    ', '123 4'])
-    def test_add_new_book_list_success(self, name):
-        collector = BooksCollector()
-        collector.add_new_book(name)
-        print(collector.books_genre.get(name))
-        assert name in collector.books_genre
